@@ -288,5 +288,43 @@ namespace AoC2022
 
             Console.WriteLine(output);
         }
+
+        [TestMethod]
+        public void Day6_1()
+        {
+            var input = File.ReadAllText("Resources/input6.txt");
+            var charList = input.ToCharArray().ToList();
+            var tempCharList = new List<char>(charList);
+
+            while (tempCharList.Count != 0)
+            {
+                var check = tempCharList.Take(4).Distinct().ToList();
+                if (check.Count == 4) break;
+                tempCharList.RemoveRange(0, 1);
+            }
+
+            var marker = (charList.Count - tempCharList.Count) + 4;
+
+            Console.WriteLine(marker);
+        }
+
+        [TestMethod]
+        public void Day6_2()
+        {
+            var input = File.ReadAllText("Resources/input6.txt");
+            var charList = input.ToCharArray().ToList();
+            var tempCharList = new List<char>(charList);
+
+            while (tempCharList.Count != 0)
+            {
+                var check = tempCharList.Take(14).Distinct().ToList();
+                if (check.Count == 14) break;
+                tempCharList.RemoveRange(0, 1);
+            }
+
+            var marker = (charList.Count - tempCharList.Count) + 14;
+
+            Console.WriteLine(marker);
+        }
     }
 }
