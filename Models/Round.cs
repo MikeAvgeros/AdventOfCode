@@ -1,6 +1,6 @@
 ﻿namespace AoC2022.Models
 {
-    public class Day2Model
+    public class Round
     {
         public string ColumnCode { get; set; }
         public string Shape { get; set; }
@@ -8,7 +8,7 @@
         public string WinsAgainst { get; set; }
         public string LosesAgainst { get; set; }
 
-        public Day2Model(string columnCode = "", string shape = "")
+        public Round(string columnCode = "", string shape = "")
         {
             if (!string.IsNullOrEmpty(columnCode))
             {

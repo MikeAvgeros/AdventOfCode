@@ -1,24 +1,24 @@
 ﻿namespace AoC2022.Models
 {
-    public class Day2Model2
+    public class Strategy
     {
         public int Points { get; set; }
 
-        public Day2Model2(Day2Model opponent, string strategy)
+        public Strategy(Round opponent, string strategy)
         {
-            Day2Model me;
+            Round me;
             switch (strategy)
             {
                 case "Y":
-                    me = new Day2Model(opponent.ColumnCode);
+                    me = new Round(opponent.ColumnCode);
                     Points = me.ShapePoints + 3;
                     break;
                 case "X":
-                    me = new Day2Model(shape: opponent.WinsAgainst);
+                    me = new Round(shape: opponent.WinsAgainst);
                     Points = me.ShapePoints;
                     break;
                 case "Z":
-                    me = new Day2Model(shape: opponent.LosesAgainst);
+                    me = new Round(shape: opponent.LosesAgainst);
                     Points = me.ShapePoints + 6;
                     break;
             }

@@ -2,9 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using AoC2022.Models;
+using Microsoft.VisualBasic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
+using Directory = AoC2022.Models.Directory;
+using FileInfo = AoC2022.Models.FileInfo;
 
 namespace AoC2022
 {
@@ -40,8 +45,8 @@ namespace AoC2022
 
             foreach (var round in inputList)
             {
-                var opponent = new Day2Model(round.First());
-                var me = new Day2Model(round.Last());
+                var opponent = new Round(round.First());
+                var me = new Round(round.Last());
 
                 if (me.Shape == opponent.Shape)
                 {
@@ -69,8 +74,8 @@ namespace AoC2022
 
             foreach (var round in inputList)
             {
-                var opponent = new Day2Model(round.First());
-                var me = new Day2Model2(opponent, round.Last());
+                var opponent = new Round(round.First());
+                var me = new Strategy(opponent, round.Last());
                 totalScore += me.Points;
             }
 
@@ -121,14 +126,18 @@ namespace AoC2022
             var inputList = input.Select(s => s.Split(",")
                     .Select(x => x.Split("-")).ToList())
                     .ToList();
+
             var duplicatePairs = 0;
 
             foreach (var pairs in inputList)
             {
-                if (int.Parse(pairs.First().First()) <= int.Parse(pairs.Last().First()) &&
-                    int.Parse(pairs.Last().Last()) <= int.Parse(pairs.First().Last()) ||
-                    int.Parse(pairs.Last().First()) <= int.Parse(pairs.First().First()) &&
-                    int.Parse(pairs.First().Last()) <= int.Parse(pairs.Last().Last()))
+                var firstStart = int.Parse(pairs.First().First());
+                var firstEnd = int.Parse(pairs.First().Last());
+                var secondStart = int.Parse(pairs.Last().First());
+                var secondEnd = int.Parse(pairs.Last().Last());
+
+                if (firstStart <= secondStart && secondEnd <= firstEnd ||
+                    secondStart <= firstStart && firstEnd <= secondEnd)
                 {
                     duplicatePairs++;
                 }
@@ -144,12 +153,17 @@ namespace AoC2022
             var inputList = input.Select(s => s.Split(",")
                     .Select(x => x.Split("-")).ToList())
                     .ToList();
+
             var duplicatePairs = 0;
 
             foreach (var pairs in inputList)
             {
-                if (int.Parse(pairs.Last().First()) <= int.Parse(pairs.First().Last()) &&
-                    int.Parse(pairs.First().First()) <= int.Parse(pairs.Last().Last()))
+                var firstStart = int.Parse(pairs.First().First());
+                var firstEnd = int.Parse(pairs.First().Last());
+                var secondStart = int.Parse(pairs.Last().First());
+                var secondEnd = int.Parse(pairs.Last().Last());
+
+                if (secondStart <= firstEnd && firstStart <= secondEnd)
                 {
                     duplicatePairs++;
                 }
@@ -325,6 +339,141 @@ namespace AoC2022
             var marker = (charList.Count - tempCharList.Count) + 14;
 
             Console.WriteLine(marker);
+        }
+
+        [TestMethod]
+        public void Day7_1()
+        {
+            var input = File.ReadAllLines("Resources/input7.txt");
+            var rootDirectory = new RootDirectory("/");
+            var currentDirectory = new Directory("");
+            var directoryRegex = new Regex("dir (?<name>\\w+)");
+            var fileRegex = new Regex("(?<filesize>\\d+) (?<filename>\\D+)");
+
+            foreach (var line in input)
+            {
+                if (line.Contains("cd"))
+                {
+                    var cmdInfo = line.Split(' ');
+
+                    if (cmdInfo.Length == 3)
+                    {
+                        if (string.Equals(cmdInfo[2], "/"))
+                        {
+                            currentDirectory = rootDirectory;
+                        }
+
+                        if (Regex.Match(cmdInfo[2], "\\w+").Success)
+                        {
+                            var newDir = currentDirectory?.SubDirectories.FirstOrDefault(x => 
+                                             x.Name == cmdInfo[2]) 
+                                             ?? new Directory(cmdInfo[2])
+                                             {
+                                                 ParentDirectory = currentDirectory
+                                             };
+                            currentDirectory = newDir;
+                        }
+
+                        if (string.Equals(cmdInfo[2], ".."))
+                        {
+                            currentDirectory = currentDirectory.ParentDirectory;
+                        }
+                    }
+                }
+
+                if (directoryRegex.Match(line).Success)
+                {
+                    var directory = new Directory(directoryRegex.Match(line).Groups["name"].Value)
+                    {
+                        ParentDirectory = currentDirectory
+                    };
+                    currentDirectory.SubDirectories.Add(directory);
+                }
+
+                if (fileRegex.Match(line).Success)
+                {
+                    var file = new FileInfo
+                    {
+                        FileSize = long.Parse(fileRegex.Match(line).Groups["filesize"].Value),
+                        FileName = fileRegex.Match(line).Groups["filename"].Value
+                    };
+                    currentDirectory.Files.Add(file);
+                }
+            }
+
+            Console.WriteLine(rootDirectory.CalculateTotalSize());
+        }
+
+        [TestMethod]
+        public void Day7_2()
+        {
+            var input = File.ReadAllLines("Resources/input7.txt");
+            var rootDirectory = new RootDirectory("/");
+            var currentDirectory = new Directory("");
+            var directoryRegex = new Regex("dir (?<name>\\w+)");
+            var fileRegex = new Regex("(?<filesize>\\d+) (?<filename>\\D+)");
+
+            foreach (var line in input)
+            {
+                if (line.Contains("cd"))
+                {
+                    var cmdInfo = line.Split(' ');
+
+                    if (cmdInfo.Length == 3)
+                    {
+                        if (string.Equals(cmdInfo[2], "/"))
+                        {
+                            currentDirectory = rootDirectory;
+                        }
+
+                        if (Regex.Match(cmdInfo[2], "\\w+").Success)
+                        {
+                            var newDir = currentDirectory?.SubDirectories.FirstOrDefault(x =>
+                                             x.Name == cmdInfo[2])
+                                             ?? new Directory(cmdInfo[2])
+                                             {
+                                                 ParentDirectory = currentDirectory
+                                             };
+                            currentDirectory = newDir;
+                        }
+
+                        if (string.Equals(cmdInfo[2], ".."))
+                        {
+                            currentDirectory = currentDirectory.ParentDirectory;
+                        }
+                    }
+                }
+
+                if (directoryRegex.Match(line).Success)
+                {
+                    var directory = new Directory(directoryRegex.Match(line).Groups["name"].Value)
+                    {
+                        ParentDirectory = currentDirectory
+                    };
+                    currentDirectory.SubDirectories.Add(directory);
+                }
+
+                if (fileRegex.Match(line).Success)
+                {
+                    var file = new FileInfo
+                    {
+                        FileSize = long.Parse(fileRegex.Match(line).Groups["filesize"].Value),
+                        FileName = fileRegex.Match(line).Groups["filename"].Value
+                    };
+                    currentDirectory.Files.Add(file);
+                }
+            }
+
+            const long totalDiskSize = 70000000;
+            const long updateSizeReq = 30000000;
+
+            var remainingDiskSize = totalDiskSize - rootDirectory.TotalFileSize;
+            var offset = updateSizeReq - remainingDiskSize;
+
+            var deletionOptions = RootDirectory.GetAllDirectories(rootDirectory)
+                .Where(x => x.TotalFileSize >= offset).ToList();
+
+            Console.WriteLine(deletionOptions.OrderBy(x => x.TotalFileSize).FirstOrDefault()?.TotalFileSize);
         }
     }
 }
