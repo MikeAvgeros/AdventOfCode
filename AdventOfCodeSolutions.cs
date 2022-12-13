@@ -581,40 +581,40 @@ namespace AoC2022
                 for (var j = 0; j < grid.GetLength(1); j++)
                 {
                     var currentTree = grid[i, j];
-                    var leftTree = 0;
-                    var rightTree = 0;
-                    var topTree = 0;
-                    var bottomTree = 0;
+                    var leftTrees = 0;
+                    var rightTrees = 0;
+                    var topTrees = 0;
+                    var bottomTrees = 0;
 
                     for (var left = j - 1; left >= 0; left--)
                     {
-                        leftTree++;
+                        leftTrees++;
                         if (grid[i, left] < currentTree) continue;
                         break;
                     }
 
                     for (var right = j + 1; right < grid.GetLength(1); right++)
                     {
-                        rightTree++;
+                        rightTrees++;
                         if (grid[i, right] < currentTree) continue;
                         break;
                     }
 
                     for (var up = i - 1; up >= 0; up--)
                     {
-                        topTree++;
+                        topTrees++;
                         if (grid[up, j] < currentTree) continue;
                         break;
                     }
 
                     for (var down = i + 1; down < grid.GetLength(0); down++)
                     {
-                        bottomTree++;
+                        bottomTrees++;
                         if (grid[down, j] < currentTree) continue;
                         break;
                     }
 
-                    var currentScenicScore = leftTree * rightTree * topTree * bottomTree;
+                    var currentScenicScore = leftTrees * rightTrees * topTrees * bottomTrees;
 
                     if (currentScenicScore > highestScenicScore) highestScenicScore = currentScenicScore;
                 }
