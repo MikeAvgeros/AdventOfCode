@@ -475,5 +475,152 @@ namespace AoC2022
 
             Console.WriteLine(deletionOptions.OrderBy(x => x.TotalFileSize).FirstOrDefault()?.TotalFileSize);
         }
+
+        [TestMethod]
+        public void Day8_1()
+        {
+            var input = File.ReadAllLines("Resources/input8.txt");
+            var grid = new int [input[0].Length, input.Length];
+            var visibleTrees = 0;
+            visibleTrees += (grid.GetLength(0) * 2) + (grid.GetLength(1) * 2) - 4;
+
+            for (var i = 0; i < grid.GetLength(0); i++)
+            {
+                for (var j = 0; j < grid.GetLength(1); j++)
+                {
+                    grid[i, j] = int.Parse(input[i][j].ToString());
+                }
+            }
+
+            for (var i = 1; i < grid.GetLength(0) - 1; i++)
+            {
+                for (var j = 1; j < grid.GetLength(1) - 1; j++)
+                {
+                    var currentTree = grid[i, j];
+                    var isVisible = true;
+
+                    for (var left = j - 1; left >= 0; left--)
+                    {
+                        if (grid[i, left] < currentTree) continue;
+                        isVisible = false;
+                        break;
+                    }
+
+                    if (isVisible)
+                    {
+                        visibleTrees++;
+                        continue;
+                    }
+
+                    isVisible = true;
+
+                    for (var right = j + 1; right < grid.GetLength(1); right++)
+                    {
+                        if (grid[i, right] < currentTree) continue;
+                        isVisible = false;
+                        break;
+                    }
+
+                    if (isVisible)
+                    {
+                        visibleTrees++;
+                        continue;
+                    }
+
+                    isVisible = true;
+
+                    for (var up = i - 1; up >= 0; up--)
+                    {
+                        if (grid[up, j] < currentTree) continue;
+                        isVisible = false;
+                        break;
+                    }
+
+                    if (isVisible)
+                    {
+                        visibleTrees++;
+                        continue;
+                    }
+
+                    isVisible = true;
+
+                    for (var down = i + 1; down < grid.GetLength(0); down++)
+                    {
+                        if (grid[down, j] < currentTree) continue;
+                        isVisible = false;
+                        break;
+                    }
+
+                    if (isVisible)
+                    {
+                        visibleTrees++;
+                    }
+                }
+            }
+
+            Console.WriteLine(visibleTrees);
+        }
+
+        [TestMethod]
+        public void Day8_2()
+        {
+            var input = File.ReadAllLines("Resources/input8.txt");
+            var grid = new int[input[0].Length, input.Length];
+            var highestScenicScore = 0;
+
+            for (var i = 0; i < grid.GetLength(0); i++)
+            {
+                for (var j = 0; j < grid.GetLength(1); j++)
+                {
+                    grid[i, j] = int.Parse(input[i][j].ToString());
+                }
+            }
+
+            for (var i = 0; i < grid.GetLength(0); i++)
+            {
+                for (var j = 0; j < grid.GetLength(1); j++)
+                {
+                    var currentTree = grid[i, j];
+                    var leftTree = 0;
+                    var rightTree = 0;
+                    var topTree = 0;
+                    var bottomTree = 0;
+
+                    for (var left = j - 1; left >= 0; left--)
+                    {
+                        leftTree++;
+                        if (grid[i, left] < currentTree) continue;
+                        break;
+                    }
+
+                    for (var right = j + 1; right < grid.GetLength(1); right++)
+                    {
+                        rightTree++;
+                        if (grid[i, right] < currentTree) continue;
+                        break;
+                    }
+
+                    for (var up = i - 1; up >= 0; up--)
+                    {
+                        topTree++;
+                        if (grid[up, j] < currentTree) continue;
+                        break;
+                    }
+
+                    for (var down = i + 1; down < grid.GetLength(0); down++)
+                    {
+                        bottomTree++;
+                        if (grid[down, j] < currentTree) continue;
+                        break;
+                    }
+
+                    var currentScenicScore = leftTree * rightTree * topTree * bottomTree;
+
+                    if (currentScenicScore > highestScenicScore) highestScenicScore = currentScenicScore;
+                }
+            }
+
+            Console.WriteLine(highestScenicScore);
+        }
     }
 }
